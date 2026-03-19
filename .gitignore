@@ -1,0 +1,28 @@
+# Build binaries
+arena
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Node dependencies
+web/node_modules/
+web/dist/
+
+# Application Data
+devices.json
+*.db
+*.sqlite
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment variables
+.env

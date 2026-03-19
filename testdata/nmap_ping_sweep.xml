@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sn -oX - 172.16.44.0/24" start="1709740800" startstr="Wed Mar  6 12:00:00 2026" version="7.95" xmloutputversion="1.05">
+<host starttime="1709740800" endtime="1709740801">
+<status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.16.44.1" addrtype="ipv4"/>
+<address addr="00:1A:2B:3C:4D:5E" addrtype="mac" vendor="Netgear"/>
+<hostnames><hostname name="router.local" type="PTR"/></hostnames>
+</host>
+<host starttime="1709740800" endtime="1709740801">
+<status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.16.44.10" addrtype="ipv4"/>
+<address addr="B8:27:EB:AA:BB:CC" addrtype="mac" vendor="Raspberry Pi Foundation"/>
+<hostnames><hostname name="pihole" type="PTR"/></hostnames>
+</host>
+<host starttime="1709740800" endtime="1709740801">
+<status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.16.44.50" addrtype="ipv4"/>
+<address addr="DC:A6:32:11:22:33" addrtype="mac" vendor="Raspberry Pi Trading"/>
+<hostnames/>
+</host>
+<host starttime="1709740800" endtime="1709740801">
+<status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.16.44.100" addrtype="ipv4"/>
+<address addr="AA:BB:CC:DD:EE:FF" addrtype="mac"/>
+<hostnames><hostname name="unknown-device" type="PTR"/></hostnames>
+</host>
+<runstats><finished time="1709740810" timestr="Wed Mar  6 12:00:10 2026" summary="4 hosts up" elapsed="10.00" exit="success"/></runstats>
+</nmaprun>

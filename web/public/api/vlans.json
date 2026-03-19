@@ -1,0 +1,61 @@
+{
+  "vlans": [
+    {
+      "id": "trusted",
+      "name": "Trusted",
+      "tag": 10,
+      "color": "#6366f1",
+      "description": "Core infrastructure and personal devices",
+      "match": {
+        "manufacturers": ["Apple", "Raspberry Pi Trading", "Raspberry Pi Foundation", "Hewlett Packard", "Arcadyan"]
+      }
+    },
+    {
+      "id": "media",
+      "name": "Media & Entertainment",
+      "tag": 20,
+      "color": "#a78bfa",
+      "description": "Streaming, audio, and display devices",
+      "match": {
+        "manufacturers": ["Sonos", "Google", "LG Innotek", "Belkin International"]
+      }
+    },
+    {
+      "id": "iot",
+      "name": "IoT",
+      "tag": 30,
+      "color": "#22d3ee",
+      "description": "Smart home sensors, hubs, and controllers",
+      "match": {
+        "manufacturers": ["Espressif", "LightwaveRF Technology", "Microchip Technology", "AzureWave Technology"]
+      }
+    },
+    {
+      "id": "cameras",
+      "name": "CCTV / Cameras",
+      "tag": 40,
+      "color": "#fb7185",
+      "description": "Surveillance cameras and NVRs",
+      "match": {
+        "manufacturers": ["Hangzhou Hikvision Digital Technology"]
+      }
+    },
+    {
+      "id": "network",
+      "name": "Network Infrastructure",
+      "tag": 50,
+      "color": "#34d399",
+      "description": "Switches, access points, and networking gear",
+      "match": {
+        "manufacturers": ["Netgear"]
+      }
+    }
+  ],
+  "defaultVlan": {
+    "id": "unassigned",
+    "name": "Unassigned",
+    "tag": 0,
+    "color": "#64748b",
+    "description": "Devices not yet assigned to a VLAN"
+  }
+}
