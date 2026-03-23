@@ -31,6 +31,12 @@ func Enrich(scanned []model.Device, known []model.Device) []model.Device {
 		if existing, ok := knownByMAC[mac]; ok {
 			// Known device — update it
 			existing.IP = s.IP
+			
+			// Flag for re-probing if it just returned online, OR if it has never been probed natively.
+			if !existing.IsOnline || existing.LastProbed.IsZero() {
+				existing.NeedsProbe = true
+			}
+			
 			existing.IsOnline = true
 			existing.LastSeen = now
 			existing.IsNew = false
@@ -62,6 +68,7 @@ func Enrich(scanned []model.Device, known []model.Device) []model.Device {
 			s.LastSeen = now
 			s.IsNew = true
 			s.IsOnline = true
+			s.NeedsProbe = true
 			s.Manufacturer = resolveManufacturer(s)
 			result = append(result, s)
 		}

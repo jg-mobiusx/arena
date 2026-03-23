@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { NetworkGraph } from './components/NetworkGraph';
-import type { Device, VlansFile } from './types';
+import type { Device, VlansFile, SystemStatus } from './types';
 
 export default function App() {
   const [devices, setDevices] = useState<Device[] | null>(null);
   const [vlansConfig, setVlansConfig] = useState<VlansFile | null>(null);
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -12,20 +13,24 @@ export default function App() {
 
     async function fetchData() {
       try {
-        const [devicesRes, vlansRes] = await Promise.all([
+        const [devicesRes, vlansRes, statusRes] = await Promise.all([
           fetch('/api/devices.json'),
-          fetch('/api/vlans.json')
+          fetch('/api/vlans.json'),
+          fetch('/api/status')
         ]);
 
         if (!devicesRes.ok) throw new Error(`Failed to fetch devices: ${devicesRes.status}`);
         if (!vlansRes.ok) throw new Error(`Failed to fetch VLANs: ${vlansRes.status}`);
+        if (!statusRes.ok) throw new Error(`Failed to fetch status: ${statusRes.status}`);
 
         const devicesData = await devicesRes.json();
         const vlansData = await vlansRes.json();
+        const statusData = await statusRes.json();
 
         if (mounted) {
           setDevices(devicesData);
           setVlansConfig(vlansData);
+          setSystemStatus(statusData);
           setError(null);
         }
       } catch (err: unknown) {
@@ -58,7 +63,7 @@ export default function App() {
     );
   }
 
-  if (!devices || !vlansConfig) {
+  if (!devices || !vlansConfig || !systemStatus) {
     return (
       <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)' }}>
         <div>Loading network topology...</div>
@@ -66,5 +71,5 @@ export default function App() {
     );
   }
 
-  return <NetworkGraph devices={devices} vlansConfig={vlansConfig} />;
+  return <NetworkGraph devices={devices} vlansConfig={vlansConfig} systemStatus={systemStatus} />;
 }

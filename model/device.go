@@ -14,6 +14,12 @@ type Device struct {
 	LastSeen     time.Time `json:"last_seen"`
 	IsNew        bool      `json:"is_new"`
 	IsOnline     bool      `json:"is_online"`
+
+	// Deep Inspection Fields
+	HttpTitle    string    `json:"http_title,omitempty"`
+	ServerHeader string    `json:"server_header,omitempty"`
+	LastProbed   time.Time `json:"last_probed,omitempty"`
+	NeedsProbe   bool      `json:"-"` // Internal use only
 }
 
 // Port represents an open network port on a device.

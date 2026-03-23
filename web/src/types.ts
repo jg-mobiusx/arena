@@ -15,6 +15,15 @@ export interface Device {
   last_seen: string;
   is_new: boolean;
   is_online: boolean;
+  http_title?: string;
+  server_header?: string;
+  last_probed?: string;
+}
+
+export interface SystemStatus {
+  last_scan: string;
+  ping_ms: number;
+  download_mbps: number;
 }
 
 export interface VlanMatch {

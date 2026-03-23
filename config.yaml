@@ -9,7 +9,3 @@ http_port: 8080
 data_file: "devices.json"
 web_dir: "web/dist"
 
-# Pi-hole DNS server for hostname resolution
-pihole:
-  address: "172.16.44.11"
-  api_token: "e1bd0a53e8ce5b67322e8c0267168b7baa8cb341762d328a48224cb56cab3d44"

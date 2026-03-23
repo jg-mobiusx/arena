@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -11,7 +11,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import type { Device, VlansFile } from '../types';
+import type { Device, VlansFile, SystemStatus } from '../types';
 import { DeviceNode } from './DeviceNode';
 import { GroupNode } from './GroupNode';
 import { RouterNode } from './RouterNode';
@@ -32,9 +32,10 @@ const nodeTypes = {
 interface NetworkGraphProps {
   devices: Device[];
   vlansConfig: VlansFile;
+  systemStatus: SystemStatus;
 }
 
-export function NetworkGraph({ devices, vlansConfig }: NetworkGraphProps) {
+export function NetworkGraph({ devices, vlansConfig, systemStatus }: NetworkGraphProps) {
   const [filter, setFilter] = useState<'all' | 'online' | 'offline'>('all');
 
   const filtered = useMemo(() => {
@@ -48,8 +49,13 @@ export function NetworkGraph({ devices, vlansConfig }: NetworkGraphProps) {
     [filtered, vlansConfig]
   );
 
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   const onlineCount = devices.filter((d) => d.is_online).length;
   const offlineCount = devices.filter((d) => !d.is_online).length;
@@ -85,6 +91,13 @@ export function NetworkGraph({ devices, vlansConfig }: NetworkGraphProps) {
 
         <div className="app-header__stats">
           <div className="stat-badge">
+            <span className="stat-badge__dot" style={{ background: systemStatus.ping_ms > 0 ? '#10b981' : '#ef4444' }} />
+            WAN {systemStatus.ping_ms > 0 ? `${systemStatus.ping_ms}ms` : 'Offline'}
+          </div>
+          <div className="stat-badge" style={{ color: 'var(--text-muted)', background: 'transparent', border: 'none', paddingLeft: 0 }}>
+            Scanned {new Date(systemStatus.last_scan).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <div className="stat-badge" style={{ marginLeft: 'auto' }}>
             <span className="stat-badge__dot stat-badge__dot--total" />
             {devices.length} devices
           </div>

@@ -12,7 +12,7 @@ import (
 
 	"github.com/johngillam/arena/enrichment"
 	"github.com/johngillam/arena/model"
-	"github.com/johngillam/arena/pihole"
+	"github.com/johngillam/arena/monitor"
 	"github.com/johngillam/arena/renderer"
 	"github.com/johngillam/arena/scanner"
 	"github.com/johngillam/arena/store"
@@ -23,18 +23,13 @@ import (
 type Config struct {
 	Subnets      []string     `yaml:"subnets"`
 	DataFile     string       `yaml:"data_file"`
-	PiHole       PiHoleConfig `yaml:"pihole"`
 	Daemon       bool         `yaml:"daemon"`
 	ScanInterval string       `yaml:"scan_interval"`
 	HTTPPort     int          `yaml:"http_port"`
 	WebDir       string       `yaml:"web_dir"`
 }
 
-// PiHoleConfig holds Pi-hole connection settings.
-type PiHoleConfig struct {
-	Address  string `yaml:"address"`
-	APIToken string `yaml:"api_token"`
-}
+
 
 func main() {
 	// Load config
@@ -98,8 +93,11 @@ func main() {
 		// Start HTTP Server
 		go startHTTPServer(cfg)
 
-		// Start Ticker Loop
-		fmt.Printf("⏱  Starting continuous scan loop every %v\n", interval)
+		// Run continuous scan daemon
+		log.Printf("⏱  Starting continuous scan loop every %s", cfg.ScanInterval)
+
+		monitor.StartBackgroundJobs()
+
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
@@ -142,7 +140,10 @@ func startHTTPServer(cfg *Config) {
 		http.ServeFile(w, r, vlansPath)
 	})
 
-	// 3. Serve the built React static files
+	// 3. Serve status endpoint
+	mux.HandleFunc("/api/status", monitor.ServeStatus)
+
+	// 4. Serve the React Frontend (everything else)
 	fs := http.FileServer(http.Dir(cfg.WebDir))
 	mux.Handle("/", fs)
 
@@ -174,39 +175,7 @@ func runScanWorkflow(cfg *Config) {
 		return
 	}
 
-	// Phase 2: Resolve hostnames via Pi-hole
-	if cfg.PiHole.Address != "" {
-		fmt.Printf("   🌐 Resolving hostnames via Pi-hole (%s)... ", cfg.PiHole.Address)
-		ph := &pihole.Client{
-			Address:  cfg.PiHole.Address,
-			APIToken: cfg.PiHole.APIToken,
-		}
 
-		ips := make([]string, 0, len(scanned))
-		for _, d := range scanned {
-			ips = append(ips, d.IP)
-		}
-
-		hostnames := ph.ResolveHostnames(ips)
-		resolved := 0
-		for i := range scanned {
-			if name, ok := hostnames[scanned[i].IP]; ok {
-				scanned[i].Hostname = name
-				resolved++
-			}
-		}
-
-		networkNames := ph.FetchNetworkTable()
-		for i := range scanned {
-			if scanned[i].Hostname == "" && scanned[i].MAC != "" {
-				if name, ok := networkNames[scanned[i].MAC]; ok {
-					scanned[i].Hostname = name
-					resolved++
-				}
-			}
-		}
-		fmt.Printf("Resolved %d hostnames.\n", resolved)
-	}
 
 	// Phase 3: Load known devices
 	known, err := store.Load(cfg.DataFile)
@@ -217,12 +186,18 @@ func runScanWorkflow(cfg *Config) {
 	// Phase 4: Enrich
 	devices := enrichment.Enrich(scanned, known)
 
+	// Phase 4.5: Probe Deep Inspection
+	fmt.Printf("   🔬 Probing devices for open ports and HTTP headers...\n")
+	devices = scanner.ProbeDevices(devices)
+
 	// Phase 5: Save
 	if err := store.Save(cfg.DataFile, devices); err != nil {
 		log.Printf("   ⚠️  Error saving device history: %v", err)
 	} else {
 		fmt.Printf("   💾 Saved %d devices to %s\n", len(devices), cfg.DataFile)
 	}
+
+	monitor.UpdateScanTime(time.Now())
 }
 
 func loadConfig(path string) (*Config, error) {

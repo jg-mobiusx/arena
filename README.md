@@ -1,18 +1,18 @@
 # 🏟 Arena — Network Monitor
 
-Arena is a lightweight, Pi-hole-integrated network topology scanner and React dashboard designed primarily for Raspberry Pi deployments. It automatically discovers, enriches, and visualizes network hardware using raw ARP sweeps and Pi-hole DNS correlations.
+Arena is a lightweight network topology scanner and React dashboard designed primarily for Raspberry Pi deployments. It automatically discovers, enriches, and visualizes network hardware using raw ARP sweeps.
 
 ## Architecture
 
 Arena is composed of two primary layers:
-1. **Go Daemon (`arena`)**: A modular backend that leverages `nmap` for precise ARP sweeps. It discovers active IPs/MACs and references an external Pi-hole server API to resolve hostnames. It saves network state recursively to a persistent `devices.json` store and acts as an embedded web server.
+1. **Go Daemon (`arena`)**: A modular backend that leverages `nmap` for precise ARP sweeps. It discovers active IPs/MACs. It saves network state recursively to a persistent `devices.json` store and acts as an embedded web server.
 2. **React Dashboard (`web`)**: A powerful Vite/React frontend using `@xyflow/react` to render complex network topographies segmented by VLAN buses.
 
 ## Requirements
 - Go 1.22+
 - Node.js 20+
 - `nmap` installed on the host machine (requires `root` privileges to scan)
-- (Optional) A Pi-hole interface for DNS correlation
+
 
 ## Running Locally
 
@@ -44,4 +44,4 @@ docker run -d --name arena --network host arena-monitor
 *(Note: Host networking is natively supported on Linux mechanisms like the Raspberry Pi, but acts as a virtual NAT on Docker Desktop for macOS, preventing proper ARP sweeps. For Mac development, run the binary directly via Go).*
 
 ## Configuration
-Edit `config.yaml` to specify which subnets to scan and point the daemon to your Pi-hole API key.
+Edit `config.yaml` to specify which subnets to scan.

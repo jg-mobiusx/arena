@@ -34,8 +34,16 @@ function DeviceNodeComponent({ data }: NodeProps) {
           <span className="device-node__mac">{device.mac || '—'}</span>
           {device.is_new && <span className="device-node__badge device-node__badge--new">NEW</span>}
         </div>
+        
+        {(device.http_title || device.server_header) && (
+          <div className="device-node__http-info" style={{ marginTop: 6, padding: '4px 6px', background: 'var(--surface-hover)', borderRadius: 4, fontSize: 10, color: 'var(--text-secondary)' }}>
+            {device.http_title && <div style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{device.http_title}</div>}
+            {device.server_header && <div style={{ fontSize: 9, opacity: 0.8 }}>{device.server_header}</div>}
+          </div>
+        )}
+
         {device.open_ports && device.open_ports.length > 0 && (
-          <div className="device-node__ports">
+          <div className="device-node__ports" style={{ marginTop: 6 }}>
             {device.open_ports.map((p) => (
               <span key={p.number} className="device-node__port-tag">
                 :{p.number}
