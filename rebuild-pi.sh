@@ -15,6 +15,9 @@ docker stop arena 2>/dev/null || true
 docker rm arena 2>/dev/null || true
 
 echo "🚀 Starting new 'arena' container..."
+# Ensure files exist before mounting so Docker doesn't map them as directories
+touch devices.json vlans.json || true
+
 # Using host networking is REQUIRED for Nmap ARP sweeps on Linux/Pi
 docker run -d \
   --name arena \
@@ -22,6 +25,7 @@ docker run -d \
   --restart unless-stopped \
   -v "$(pwd)/devices.json:/app/devices.json" \
   -v "$(pwd)/config.yaml:/app/config.yaml" \
+  -v "$(pwd)/vlans.json:/app/vlans.json" \
   arena-monitor
 
 echo "✅ Deployment complete! The Arena daemon should be running on the host network."
